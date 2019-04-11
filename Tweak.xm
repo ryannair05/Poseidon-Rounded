@@ -1,3 +1,5 @@
+#define SCREEN_WIDTH ([[UIScreen mainScreen] bounds].size.width)
+
 // Enable home gestures
 %hook BSPlatform
 - (NSInteger)homeButtonType {
@@ -22,9 +24,23 @@
 }
 %end
 
+//FUgap, credit to smokin1337
+%hook CCUIHeaderPocketView
+-(CGRect)contentBounds{
+             return CGRectMake (0,0,SCREEN_WIDTH,65);
+  }
+%end
+
+%hook CCUIScrollView
+-(void)setContentInset:(UIEdgeInsets)arg1 {
+     arg1 = UIEdgeInsetsMake(50,0,0,0);
+     %orig;
+  }
+%end
+
 %hook _UIStatusBarVisualProvider_iOS
 + (Class)class {
-    return NSClassFromString(@"_UIStatusBarVisualProvider_Split58");
+	return NSClassFromString(@"_UIStatusBarVisualProvider_Split58"); 
 }
 %end
 
@@ -37,13 +53,10 @@
 }
 %end
 
-//FUgap, credit to smokin1337
-%hook CCUIHeaderPocketView
-  //Hide Header Blur
-  -(void)setBackgroundAlpha:(double)arg1{
-      arg1 = 0.0;
-      %orig;
-  }
+%hook UIStatusBar
++ (CGFloat)heightForOrientation:(NSInteger)orientation {
+		return %orig - 10;
+	}
 %end
 
 //Thanks to NoisyFlake and his tweak ModernDock
@@ -52,3 +65,32 @@
 	return 19;
 }
 %end
+
+%hook SBDockIconListView
++ (NSUInteger)maxIcons {
+	return 5;
+}
+%end
+
+%hook UIKeyboardImpl
++ (UIEdgeInsets)deviceSpecificPaddingForInterfaceOrientation:(long long)arg1 inputMode:(id)arg2 {
+UIEdgeInsets orig = %orig;
+		orig.bottom =  40;		
+		return orig;
+}
+%end
+
+@interface UIKeyboardDockView : UIView
+@end
+
+%hook UIKeyboardDockView
+- (CGRect)bounds {
+		CGRect bounds = %orig;
+		bounds.size.height += 20;
+		return bounds;
+}
+
+%end
+
+
+
