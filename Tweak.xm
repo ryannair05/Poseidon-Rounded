@@ -22,9 +22,24 @@
 }
 %end
 
+//FUgap, credit to smokin1337
+%hook CCUIScrollView
+-(void)setContentInset:(UIEdgeInsets)arg1 {
+     arg1 = UIEdgeInsetsMake(65,0,0,0);
+     %orig;
+  }
+%end
+
+%hook CCUIHeaderPocketView
+-(void)setBackgroundAlpha:(double)arg1 {
+    arg1 = 0.0;
+    %orig;
+}
+%end
+
 %hook _UIStatusBarVisualProvider_iOS
 + (Class)class {
-    return NSClassFromString(@"_UIStatusBarVisualProvider_Split58");
+	return NSClassFromString(@"_UIStatusBarVisualProvider_Split58"); 
 }
 %end
 
@@ -37,18 +52,41 @@
 }
 %end
 
-//FUgap, credit to smokin1337
-%hook CCUIHeaderPocketView
-  //Hide Header Blur
-  -(void)setBackgroundAlpha:(double)arg1{
-      arg1 = 0.0;
-      %orig;
-  }
-%end
 
-//Thanks to NoisyFlake and his tweak ModernDock
 %hook UITraitCollection
 - (CGFloat)displayCornerRadius {
 	return 19;
 }
 %end
+
+%hook SBDockIconListView
++ (NSUInteger)maxIcons {
+	return 5;
+}
+%end
+
+%hook UIKeyboardImpl
++ (UIEdgeInsets)deviceSpecificPaddingForInterfaceOrientation:(long long)arg1 inputMode:(id)arg2 {
+		UIEdgeInsets orig = %orig;
+                if (NSClassFromString(@"BarmojiCollectionView")) {
+                orig.bottom = 60;
+		} else {
+		orig.bottom =  40;
+		}		
+		return orig;
+}
+%end
+
+%hook UIKeyboardDockView
+- (CGRect)bounds {
+		CGRect bounds = %orig;
+		 if (NSClassFromString(@"BarmojiCollectionView")) {
+		bounds.size.height += 4;
+		} else {
+		bounds.size.height += 20;
+		}
+		return bounds;
+}
+%end
+
+
